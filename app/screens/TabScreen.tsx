@@ -26,8 +26,6 @@ const DATA = [
   },
 ];
 
-type ItemProps = { title: string };
-
 export default function TabScreen({ navigation }: any) {
   useLayoutEffect(() => {
     navigation.setOptions({

@@ -5,8 +5,15 @@ import { FlatList } from 'react-native-gesture-handler';
 import { TabBar, TabView } from 'react-native-tab-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FloatingButton from '../components/FloatingButton';
+import TextInputDialog from '../components/TextInputDialog';
 import TodoListItem from '../components/TodoListItem';
-import AlertUtil from '../utils/AlertUtil';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F2F2F7',
+  },
+});
 
 const DATA = [
   {
@@ -34,6 +41,9 @@ export default function HomeScreen({ navigation }: any) {
     { key: 'tab4', title: 'タブ4' },
     { key: 'tab5', title: 'タブ5' },
   ]);
+
+  const [visibleAddTodoAlert, setVisibleAddTodoAlert] = React.useState(false);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => {
@@ -45,16 +55,6 @@ export default function HomeScreen({ navigation }: any) {
       },
     });
   }, []);
-
-  /**
-   * Todo追加アラートを表示する
-   *
-   */
-  function showAddTodoAlert() {
-    AlertUtil.showTextInputAlert('TODO追加', 'TODOタイトルを入力してください', (text) => {
-      console.log(text);
-    });
-  }
 
   const renderScene = ({ route }: any) => {
     switch (route.key) {
@@ -95,17 +95,16 @@ export default function HomeScreen({ navigation }: any) {
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
       />
-      <FloatingButton onPress={showAddTodoAlert}></FloatingButton>
+      <FloatingButton onPress={() => setVisibleAddTodoAlert(true)}></FloatingButton>
+      <TextInputDialog
+        visible={visibleAddTodoAlert}
+        title={'TODO追加'}
+        description={'TODOタイトルを入力してください'}
+        placeholder={'50文字以内'}
+        maxLength={50}
+        cancelCallback={() => setVisibleAddTodoAlert(false)}
+        okCallback={() => setVisibleAddTodoAlert(false)}></TextInputDialog>
       <StatusBar style="light" />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2F2F7',
-    // alignItems: 'center',
-    // justifyContent: 'center',
-  },
-});

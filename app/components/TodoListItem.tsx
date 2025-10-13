@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { ListItem } from 'react-native-elements';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import Checkmark from './Checkmark';
 import SwipeableRow from './SwipeableRow';
 
@@ -36,12 +37,14 @@ export default function TodoListItem({ todoTitle }: { todoTitle: string }) {
 
   return (
     <SwipeableRow onPress={btnTapped}>
-      <ListItem topDivider style={{ width: '100%' }}>
-        <ListItem.Content style={styles.ListItem}>
-          <Checkmark complete={true}></Checkmark>
-          <ListItem.Title style={styles.ListItemTitle}>{`${todoTitle}`}</ListItem.Title>
-        </ListItem.Content>
-      </ListItem>
+      <TouchableOpacity activeOpacity={1}>
+        <ListItem topDivider style={{ width: '100%' }}>
+          <ListItem.Content style={styles.ListItem}>
+            <Checkmark complete={true} onPress={() => {}}></Checkmark>
+            <ListItem.Title style={styles.ListItemTitle}>{`${todoTitle}`}</ListItem.Title>
+          </ListItem.Content>
+        </ListItem>
+      </TouchableOpacity>
     </SwipeableRow>
   );
 }

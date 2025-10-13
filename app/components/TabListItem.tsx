@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { ListItem } from 'react-native-elements';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import SwipeableRow from './SwipeableRow';
 
 const styles = StyleSheet.create({
@@ -34,11 +35,13 @@ export default function TabListItem({ tabTitle }: { tabTitle: string }) {
 
   return (
     <SwipeableRow onPress={btnTapped}>
-      <ListItem topDivider style={{ width: '100%' }}>
-        <ListItem.Content style={styles.ListItem}>
-          <ListItem.Title style={styles.ListItemTitle}>{`${tabTitle}`}</ListItem.Title>
-        </ListItem.Content>
-      </ListItem>
+      <TouchableOpacity activeOpacity={1}>
+        <ListItem topDivider style={{ width: '100%' }}>
+          <ListItem.Content style={styles.ListItem}>
+            <ListItem.Title style={styles.ListItemTitle}>{`${tabTitle}`}</ListItem.Title>
+          </ListItem.Content>
+        </ListItem>
+      </TouchableOpacity>
     </SwipeableRow>
   );
 }
