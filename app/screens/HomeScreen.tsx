@@ -7,6 +7,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import FloatingButton from '../components/FloatingButton';
 import TextInputDialog from '../components/TextInputDialog';
 import TodoListItem from '../components/TodoListItem';
+import { TabContext, TabContextType } from '../contexts/TabContext';
+import TodoTabService from '../services/TodoTabService';
 
 const styles = StyleSheet.create({
   container: {
@@ -34,15 +36,13 @@ export default function HomeScreen({ navigation }: any) {
   const layout = useWindowDimensions();
 
   const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    { key: 'tab1', title: 'タブ1' },
-    { key: 'tab2', title: 'タブ2' },
-    { key: 'tab3', title: 'タブ3' },
-    { key: 'tab4', title: 'タブ4' },
-    { key: 'tab5', title: 'タブ5' },
-  ]);
+  const [routes, setRoutes] = React.useState<{ key: string; title: string }[]>([]);
+
+  const [tabList, setTabList] = React.useState<{ key: string; name: string; date: Date }[]>([]);
 
   const [visibleAddTodoAlert, setVisibleAddTodoAlert] = React.useState(false);
+
+  const tabContext = React.useContext(TabContext) as TabContextType;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -55,6 +55,46 @@ export default function HomeScreen({ navigation }: any) {
       },
     });
   }, []);
+
+  React.useEffect(() => {
+    (async function () {
+      try {
+        const todoTabService = new TodoTabService();
+        const storageTabList = await todoTabService.getTabList();
+
+        setTabList(storageTabList);
+      } catch (e) {
+        setTabList([]);
+      }
+    })();
+  }, []);
+
+  // タブ更新時に実行
+  React.useEffect(() => {
+    if (tabContext.tabReload.get) {
+      (async function () {
+        try {
+          const todoTabService = new TodoTabService();
+          const storageTabList = await todoTabService.getTabList();
+
+          setTabList(storageTabList);
+        } catch (e) {
+          setTabList([]);
+        } finally {
+          tabContext.tabReload.set(false);
+        }
+      })();
+    }
+  }, [tabContext.tabReload]);
+
+  // タブ一覧更新時に実行
+  React.useEffect(() => {
+    const tabListRoutes = tabList.map((tabObj) => {
+      return { key: tabObj.key, title: tabObj.name };
+    });
+
+    setRoutes(tabListRoutes);
+  }, [tabList]);
 
   const renderScene = ({ route }: any) => {
     switch (route.key) {
@@ -88,22 +128,26 @@ export default function HomeScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <TabView
-        renderTabBar={renderTabBar}
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={{ width: layout.width }}
-      />
-      <FloatingButton onPress={() => setVisibleAddTodoAlert(true)}></FloatingButton>
-      <TextInputDialog
-        visible={visibleAddTodoAlert}
-        title={'TODO追加'}
-        description={'TODOタイトルを入力してください'}
-        placeholder={'50文字以内'}
-        maxLength={50}
-        cancelCallback={() => setVisibleAddTodoAlert(false)}
-        okCallback={() => setVisibleAddTodoAlert(false)}></TextInputDialog>
+      {0 < routes.length && (
+        <>
+          <TabView
+            renderTabBar={renderTabBar}
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{ width: layout.width }}
+          />
+          <FloatingButton onPress={() => setVisibleAddTodoAlert(true)}></FloatingButton>
+          <TextInputDialog
+            visible={visibleAddTodoAlert}
+            title={'TODO追加'}
+            description={'TODOタイトルを入力してください'}
+            placeholder={'50文字以内'}
+            maxLength={50}
+            cancelCallback={() => setVisibleAddTodoAlert(false)}
+            okCallback={() => setVisibleAddTodoAlert(false)}></TextInputDialog>
+        </>
+      )}
       <StatusBar style="light" />
     </View>
   );

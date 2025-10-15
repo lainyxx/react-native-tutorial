@@ -36,8 +36,6 @@ export default class TodoTabService {
     } catch (e) {
       throw e;
     }
-
-    console.log('addTab: ', AsyncStorage.getItem('@tabkey'));
   }
 
   /**
