@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import TabListItem from '../components/TabListItem';
 import TextInputDialog from '../components/TextInputDialog';
 import { TabContext, TabContextType } from '../contexts/TabContext';
-import TodoTabService from '../services/TodoTabService';
+import TodoTabService, { TodoTab } from '../services/TodoTabService';
 
 const styles = StyleSheet.create({
   container: {
@@ -14,9 +14,13 @@ const styles = StyleSheet.create({
   },
 });
 
+let selectedEditTabKey = '';
+let selectedEditTabName = '';
+
 export default function TabScreen({ navigation }: any) {
-  const [tabList, setTabList] = React.useState<{ key: string; name: string; date: Date }[]>([]);
+  const [tabList, setTabList] = React.useState<TodoTab[]>([]);
   const [visibleAddTabAlert, setVisibleAddTabAlert] = React.useState(false);
+  const [visibleEditTabAlert, setVisibleEditTabAlert] = React.useState(false);
 
   const tabContext = React.useContext(TabContext) as TabContextType;
 
@@ -46,6 +50,19 @@ export default function TabScreen({ navigation }: any) {
   }, []);
 
   /**
+   * タブ編集ダイアログ表示処理
+   *
+   * @param {string} editTabKey
+   * @param {string} editTabName
+   */
+  function showEditTodoAlert(editTabKey: string, editTabName: string) {
+    selectedEditTabKey = editTabKey;
+    selectedEditTabName = editTabName;
+
+    setVisibleEditTabAlert(true);
+  }
+
+  /**
    * タブ追加処理
    *
    * @param {string} tabName 追加するタブ名
@@ -64,13 +81,35 @@ export default function TabScreen({ navigation }: any) {
     }
   }
 
+  /**
+   * タブ編集処理
+   *
+   * @param {string} tabName　編集後のタブ名
+   */
+  async function editTab(tabName: string) {
+    try {
+      const todoTabService = new TodoTabService();
+      await todoTabService.editTab(selectedEditTabKey, tabName);
+      const storageTabList = await todoTabService.getTabList();
+
+      setTabList(storageTabList);
+
+      tabContext.tabReload.set(true);
+    } catch (e) {
+      Alert.alert('エラー', 'タブの編集に失敗しました', [{ text: 'OK' }]);
+    }
+
+    selectedEditTabKey = '';
+    selectedEditTabName = '';
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
         contentContainerStyle={{ paddingTop: 30 }}
         data={tabList}
         renderItem={({ item }) => {
-          return <TabListItem tabTitle={item.name}></TabListItem>;
+          return <TabListItem tabKey={item.key} tabTitle={item.name} listItemTapped={showEditTodoAlert}></TabListItem>;
         }}
         keyExtractor={(item) => item.key}
       />
@@ -85,6 +124,19 @@ export default function TabScreen({ navigation }: any) {
         okCallback={async (text) => {
           await addTab(text);
           setVisibleAddTabAlert(false);
+        }}></TextInputDialog>
+
+      <TextInputDialog
+        visible={visibleEditTabAlert}
+        defaultValue={selectedEditTabName}
+        title={'タブ編集'}
+        description={'編集するタブ名を入力してください'}
+        placeholder={'20文字以内'}
+        maxLength={20}
+        cancelCallback={() => setVisibleEditTabAlert(false)}
+        okCallback={async (text) => {
+          await editTab(text);
+          setVisibleEditTabAlert(false);
         }}></TextInputDialog>
 
       <StatusBar style="light" />

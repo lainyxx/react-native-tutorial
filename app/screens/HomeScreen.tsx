@@ -8,7 +8,7 @@ import FloatingButton from '../components/FloatingButton';
 import TextInputDialog from '../components/TextInputDialog';
 import TodoListItem from '../components/TodoListItem';
 import { TabContext, TabContextType } from '../contexts/TabContext';
-import TodoTabService from '../services/TodoTabService';
+import TodoTabService, { TodoTab } from '../services/TodoTabService';
 
 const styles = StyleSheet.create({
   container: {
@@ -38,7 +38,7 @@ export default function HomeScreen({ navigation }: any) {
   const [index, setIndex] = React.useState(0);
   const [routes, setRoutes] = React.useState<{ key: string; title: string }[]>([]);
 
-  const [tabList, setTabList] = React.useState<{ key: string; name: string; date: Date }[]>([]);
+  const [tabList, setTabList] = React.useState<TodoTab[]>([]);
 
   const [visibleAddTodoAlert, setVisibleAddTodoAlert] = React.useState(false);
 

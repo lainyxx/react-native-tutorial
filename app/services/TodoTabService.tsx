@@ -1,5 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export type TodoTab = {
+  key: string;
+  name: string;
+  date: string; // ISO形式
+};
+
 export default class TodoTabService {
   /**
    * Todoタブのキーを作成する
@@ -33,6 +39,26 @@ export default class TodoTabService {
       let tabList = await this.getTabList();
       tabList.push(addTabObj);
       await AsyncStorage.setItem('@tabkey', JSON.stringify(tabList));
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  /**
+   * Todoタブを編集する
+   *
+   * @param {string} editTabKey　編集するタブのキー
+   * @param {string} editTabName  編集するタブのタブ名
+   * @memberof TodoTabService
+   */
+  async editTab(editTabKey: string, editTabName: string) {
+    try {
+      const tabList = await this.getTabList();
+      const editTabObj = tabList.filter((tabObj: TodoTab) => tabObj.key == editTabKey)[0];
+      editTabObj.name = editTabName;
+      const updateTabList = tabList.map((tabObj: TodoTab) => (tabObj.key == editTabKey ? editTabObj : tabObj));
+
+      await AsyncStorage.setItem('@tabkey', JSON.stringify(updateTabList));
     } catch (e) {
       throw e;
     }
