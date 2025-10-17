@@ -65,6 +65,26 @@ export default class TodoTabService {
   }
 
   /**
+   * Todoタブを削除する
+   *
+   * @param {string} tabKey 削除するタブのキー
+   * @memberof TodoTabService
+   */
+  async deleteTab(tabKey: string) {
+    try {
+      // タブを削除
+      const tabList = await this.getTabList();
+      const updateTabList = tabList.filter((tabObj: TodoTab) => tabObj.key != tabKey);
+
+      await AsyncStorage.setItem('@tabkey', JSON.stringify(updateTabList));
+
+      // タブに紐づくタスクを削除
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  /**
    * Todo一覧を取得
    *
    * @return {Promise<string>} タブ一覧（ストレージにタブ情報が存在しない場合は、空配列を返す）

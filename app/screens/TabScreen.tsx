@@ -90,8 +90,8 @@ export default function TabScreen({ navigation }: any) {
     try {
       const todoTabService = new TodoTabService();
       await todoTabService.editTab(selectedEditTabKey, tabName);
-      const storageTabList = await todoTabService.getTabList();
 
+      const storageTabList = await todoTabService.getTabList();
       setTabList(storageTabList);
 
       tabContext.tabReload.set(true);
@@ -103,13 +103,32 @@ export default function TabScreen({ navigation }: any) {
     selectedEditTabName = '';
   }
 
+  /**
+   * タブ削除処理
+   *
+   * @param {string} tabKey 削除するタブのキー
+   */
+  async function deleteTab(tabKey: string) {
+    try {
+      const todoTabService = new TodoTabService();
+      await todoTabService.deleteTab(tabKey);
+
+      const storageTabList = await todoTabService.getTabList();
+      setTabList(storageTabList);
+
+      tabContext.tabReload.set(true);
+    } catch (e) {
+      Alert.alert('エラー', 'タブの削除に失敗しました', [{ text: 'OK' }]);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
         contentContainerStyle={{ paddingTop: 30 }}
         data={tabList}
         renderItem={({ item }) => {
-          return <TabListItem tabKey={item.key} tabTitle={item.name} listItemTapped={showEditTodoAlert}></TabListItem>;
+          return <TabListItem tabKey={item.key} tabTitle={item.name} listItemTapped={showEditTodoAlert} deleteBtnTapped={deleteTab}></TabListItem>;
         }}
         keyExtractor={(item) => item.key}
       />

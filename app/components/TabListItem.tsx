@@ -20,17 +20,20 @@ const styles = StyleSheet.create({
  * @export
  * @param {string} todoTitle - Tabタイトル
  * @param {string} tabKey - Tabキー
- * @param {(tabkey: stirng, todoTitle: string)} listItemTapped - リストタップ時の処理
+ * @param {(tabkey: stirng, todoTitle: string) => void} listItemTapped - リストタップ時の処理
+ * @param {(tabkey: stirng) => void} deleteBtnTapped - 削除ボタンタップ時の処理
  * @return {TabListItem}
  */
 export default function TabListItem({
   tabTitle,
   tabKey,
   listItemTapped,
+  deleteBtnTapped,
 }: {
   tabTitle: string;
   tabKey: string;
   listItemTapped: (tabKey: string, tabTitle: string) => void;
+  deleteBtnTapped: (tabKey: string) => void;
 }) {
   /**
    *  ボタン押下イベント
@@ -40,6 +43,7 @@ export default function TabListItem({
   const btnTapped = (btnId: number) => {
     if (btnId === 0) {
       // 削除処理を実行
+      deleteBtnTapped(tabKey);
     }
   };
 
