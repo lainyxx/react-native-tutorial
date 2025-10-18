@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useLayoutEffect } from 'react';
-import { StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Alert, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { TabBar, TabView } from 'react-native-tab-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -9,6 +9,7 @@ import TextInputDialog from '../components/TextInputDialog';
 import TodoListItem from '../components/TodoListItem';
 import { TabContext, TabContextType } from '../contexts/TabContext';
 import TodoTabService, { TodoTab } from '../services/TodoTabService';
+import TodoTaskService from '../services/TodoTaskService';
 
 const styles = StyleSheet.create({
   container: {
@@ -31,6 +32,8 @@ const DATA = [
     title: 'Todo3',
   },
 ];
+
+let selectedTabKey = '';
 
 export default function HomeScreen({ navigation }: any) {
   const layout = useWindowDimensions();
@@ -63,8 +66,11 @@ export default function HomeScreen({ navigation }: any) {
         const storageTabList = await todoTabService.getTabList();
 
         setTabList(storageTabList);
+
+        selectedTabKey = storageTabList.length ? storageTabList[0].key : '';
       } catch (e) {
         setTabList([]);
+        selectedTabKey = '';
       }
     })();
   }, []);
@@ -94,7 +100,31 @@ export default function HomeScreen({ navigation }: any) {
     });
 
     setRoutes(tabListRoutes);
+
+    // タブ更新前に選択されていたタブを選択する
+    const selectedTabIndex = tabList.findIndex((tabObj) => tabObj.key == selectedTabKey);
+    0 <= selectedTabIndex ? setIndex(selectedTabIndex) : setIndex(0);
+
+    selectedTabKey = tabList.length ? (0 <= selectedTabIndex ? tabList[selectedTabIndex].key : tabList[0].key) : '';
+    console.log(selectedTabKey);
   }, [tabList]);
+
+  /**
+   * タスク追加処理
+   *
+   * @param {string} taskName 追加するタスク名
+   */
+  async function addTask(taskName: string) {
+    try {
+      const todoTaskService = new TodoTaskService();
+      await todoTaskService.addTask(selectedTabKey, taskName);
+
+      // const storageTaskList = await todoTaskService.getTabList();
+      // setTabList(storageTaskList);
+    } catch (e) {
+      Alert.alert('エラー', 'Todoの追加に失敗しました', [{ text: 'OK' }]);
+    }
+  }
 
   const renderScene = ({ route }: any) => {
     switch (route.key) {
@@ -134,7 +164,11 @@ export default function HomeScreen({ navigation }: any) {
             renderTabBar={renderTabBar}
             navigationState={{ index, routes }}
             renderScene={renderScene}
-            onIndexChange={setIndex}
+            onIndexChange={(index: number) => {
+              selectedTabKey = tabList[index].key;
+              console.log(selectedTabKey);
+              setIndex(index);
+            }}
             initialLayout={{ width: layout.width }}
           />
           <FloatingButton onPress={() => setVisibleAddTodoAlert(true)}></FloatingButton>
@@ -145,7 +179,10 @@ export default function HomeScreen({ navigation }: any) {
             placeholder={'50文字以内'}
             maxLength={50}
             cancelCallback={() => setVisibleAddTodoAlert(false)}
-            okCallback={() => setVisibleAddTodoAlert(false)}></TextInputDialog>
+            okCallback={async (text) => {
+              await addTask(text);
+              setVisibleAddTodoAlert(false);
+            }}></TextInputDialog>
         </>
       )}
       <StatusBar style="light" />
