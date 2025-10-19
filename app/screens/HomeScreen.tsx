@@ -9,7 +9,7 @@ import TextInputDialog from '../components/TextInputDialog';
 import TodoListItem from '../components/TodoListItem';
 import { TabContext, TabContextType } from '../contexts/TabContext';
 import TodoTabService, { TodoTab } from '../services/TodoTabService';
-import TodoTaskService from '../services/TodoTaskService';
+import TodoTaskService, { TodoTask } from '../services/TodoTaskService';
 
 const styles = StyleSheet.create({
   container: {
@@ -21,15 +21,15 @@ const styles = StyleSheet.create({
 const DATA = [
   {
     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'Todo1',
+    name: 'Todo1',
   },
   {
     id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Todo2',
+    name: 'Todo2',
   },
   {
     id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Todo3',
+    name: 'Todo3',
   },
 ];
 
@@ -42,6 +42,7 @@ export default function HomeScreen({ navigation }: any) {
   const [routes, setRoutes] = React.useState<{ key: string; title: string }[]>([]);
 
   const [tabList, setTabList] = React.useState<TodoTab[]>([]);
+  const [taskList, setTaskList] = React.useState<TodoTask[]>([]);
 
   const [visibleAddTodoAlert, setVisibleAddTodoAlert] = React.useState(false);
 
@@ -62,14 +63,20 @@ export default function HomeScreen({ navigation }: any) {
   React.useEffect(() => {
     (async function () {
       try {
+        // タブ取得
         const todoTabService = new TodoTabService();
         const storageTabList = await todoTabService.getTabList();
-
         setTabList(storageTabList);
+
+        // タスク取得
+        const todoTaskService = new TodoTaskService();
+        const storageTaskList = await todoTaskService.getTaskList();
+        setTaskList(storageTaskList);
 
         selectedTabKey = storageTabList.length ? storageTabList[0].key : '';
       } catch (e) {
         setTabList([]);
+        setTaskList([]);
         selectedTabKey = '';
       }
     })();
@@ -119,8 +126,8 @@ export default function HomeScreen({ navigation }: any) {
       const todoTaskService = new TodoTaskService();
       await todoTaskService.addTask(selectedTabKey, taskName);
 
-      // const storageTaskList = await todoTaskService.getTabList();
-      // setTabList(storageTaskList);
+      const storageTaskList = await todoTaskService.getTaskList();
+      setTaskList(storageTaskList);
     } catch (e) {
       Alert.alert('エラー', 'Todoの追加に失敗しました', [{ text: 'OK' }]);
     }
@@ -129,11 +136,12 @@ export default function HomeScreen({ navigation }: any) {
   const renderScene = ({ route }: any) => {
     switch (route.key) {
       default:
+        const filterTaskList = taskList.filter((taskObj) => taskObj.key == route.key);
         return (
           <FlatList
-            data={DATA}
+            data={filterTaskList}
             renderItem={({ item }) => {
-              return <TodoListItem todoTitle={item.title}></TodoListItem>;
+              return <TodoListItem todoTitle={item.name}></TodoListItem>;
             }}
             keyExtractor={(item) => item.id}
           />

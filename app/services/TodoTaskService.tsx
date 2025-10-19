@@ -1,5 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export type TodoTask = {
+  id: string;
+  key: string;
+  name: string;
+  complete: boolean;
+  date: string; // ISO形式
+};
+
 export default class TodoTaskService {
   /**
    * TodoタスクのIDを作成する
