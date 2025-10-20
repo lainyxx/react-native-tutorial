@@ -34,6 +34,8 @@ const DATA = [
 ];
 
 let selectedTabKey = '';
+let selectedEditTaskId = '';
+let selectedEditTaskName = '';
 
 export default function HomeScreen({ navigation }: any) {
   const layout = useWindowDimensions();
@@ -44,7 +46,8 @@ export default function HomeScreen({ navigation }: any) {
   const [tabList, setTabList] = React.useState<TodoTab[]>([]);
   const [taskList, setTaskList] = React.useState<TodoTask[]>([]);
 
-  const [visibleAddTodoAlert, setVisibleAddTodoAlert] = React.useState(false);
+  const [visibleAddTodoAlert, setVisibleAddTodoAlert] = React.useState<boolean>(false);
+  const [visibleEditTodoAlert, setVisibleEditTodoAlert] = React.useState<boolean>(false);
 
   const tabContext = React.useContext(TabContext) as TabContextType;
 
@@ -113,8 +116,20 @@ export default function HomeScreen({ navigation }: any) {
     0 <= selectedTabIndex ? setIndex(selectedTabIndex) : setIndex(0);
 
     selectedTabKey = tabList.length ? (0 <= selectedTabIndex ? tabList[selectedTabIndex].key : tabList[0].key) : '';
-    console.log(selectedTabKey);
   }, [tabList]);
+
+  /**
+   * タスク編集ダイアログ表示処理
+   *
+   * @param {string} editTaskId　編集するタスクのID
+   * @param {string} editTaskName 編集するタスクのタスク名
+   */
+  function showEditTaskAlert(editTaskId: string, editTaskName: string) {
+    selectedEditTaskId = editTaskId;
+    selectedEditTaskName = editTaskName;
+
+    setVisibleEditTodoAlert(true);
+  }
 
   /**
    * タスク追加処理
@@ -133,6 +148,26 @@ export default function HomeScreen({ navigation }: any) {
     }
   }
 
+  /**
+   * タスク編集処理
+   *
+   * @param {string} taskName　編集後のタスク名
+   */
+  async function editTask(taskName: string) {
+    try {
+      const todoTaskService = new TodoTaskService();
+      await todoTaskService.editTask(selectedEditTaskId, taskName);
+
+      const storageTaskList = await todoTaskService.getTaskList();
+      setTaskList(storageTaskList);
+    } catch (e) {
+      Alert.alert('エラー', 'Todoの編集に失敗しました', [{ text: 'OK' }]);
+    }
+
+    selectedEditTaskId = '';
+    selectedEditTaskName = '';
+  }
+
   const renderScene = ({ route }: any) => {
     switch (route.key) {
       default:
@@ -141,7 +176,7 @@ export default function HomeScreen({ navigation }: any) {
           <FlatList
             data={filterTaskList}
             renderItem={({ item }) => {
-              return <TodoListItem todoTitle={item.name}></TodoListItem>;
+              return <TodoListItem taskId={item.id} todoTitle={item.name} listItemTapped={showEditTaskAlert}></TodoListItem>;
             }}
             keyExtractor={(item) => item.id}
           />
@@ -174,7 +209,6 @@ export default function HomeScreen({ navigation }: any) {
             renderScene={renderScene}
             onIndexChange={(index: number) => {
               selectedTabKey = tabList[index].key;
-              console.log(selectedTabKey);
               setIndex(index);
             }}
             initialLayout={{ width: layout.width }}
@@ -190,6 +224,19 @@ export default function HomeScreen({ navigation }: any) {
             okCallback={async (text) => {
               await addTask(text);
               setVisibleAddTodoAlert(false);
+            }}></TextInputDialog>
+
+          <TextInputDialog
+            visible={visibleEditTodoAlert}
+            defaultValue={selectedEditTaskName}
+            title={'Todo編集'}
+            description={'編集するTodo名を入力してください'}
+            placeholder={'50文字以内'}
+            maxLength={50}
+            cancelCallback={() => setVisibleEditTodoAlert(false)}
+            okCallback={async (text) => {
+              await editTask(text);
+              setVisibleEditTodoAlert(false);
             }}></TextInputDialog>
         </>
       )}

@@ -20,10 +20,21 @@ const styles = StyleSheet.create({
  *  TODOリストアイテム
  *
  * @export
+ * @param {string} taskId -  TODOタスクID
  * @param {string} todoTitle - TODOタイトル
+ * @param {string} todoTitle - TODOタイトル
+ * @param {(taskId: stirng, todoTitle: string) => void} listItemTapped - リストタップ時の処理
  * @return {TodoListItem}
  */
-export default function TodoListItem({ todoTitle }: { todoTitle: string }) {
+export default function TodoListItem({
+  taskId,
+  todoTitle,
+  listItemTapped,
+}: {
+  taskId: string;
+  todoTitle: string;
+  listItemTapped: (taskId: string, tabTitle: string) => void;
+}) {
   /**
    *  ボタン押下イベント
    *
@@ -37,7 +48,7 @@ export default function TodoListItem({ todoTitle }: { todoTitle: string }) {
 
   return (
     <SwipeableRow onPress={btnTapped}>
-      <TouchableOpacity activeOpacity={1}>
+      <TouchableOpacity onPress={() => listItemTapped(taskId, todoTitle)} activeOpacity={1}>
         <ListItem topDivider style={{ width: '100%' }}>
           <ListItem.Content style={styles.ListItem}>
             <Checkmark complete={true} onPress={() => {}}></Checkmark>
