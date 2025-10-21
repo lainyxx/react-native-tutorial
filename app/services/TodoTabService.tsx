@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import TodoTaskService from './TodoTaskService';
 
 export type TodoTab = {
   key: string;
@@ -79,6 +80,8 @@ export default class TodoTabService {
       await AsyncStorage.setItem('@tabkey', JSON.stringify(updateTabList));
 
       // タブに紐づくタスクを削除
+      const todoTaskService = new TodoTaskService();
+      await todoTaskService.deleteTaskTargetTabKey(tabKey);
     } catch (e) {
       throw e;
     }

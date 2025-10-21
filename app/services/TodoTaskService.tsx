@@ -70,6 +70,39 @@ export default class TodoTaskService {
   }
 
   /**
+   * Todoタスクを削除する
+   *
+   * @param {string} taskId 削除するタスクのID
+   * @memberof TodoTaskService
+   */
+  async deleteTask(taskId: string) {
+    try {
+      const taskList = await this.getTaskList();
+      const updateTaskList = taskList.filter((taskObj: TodoTask) => taskObj.id != taskId);
+
+      await AsyncStorage.setItem('@taskkey', JSON.stringify(updateTaskList));
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  /**
+   * 指定したタブのタスクを削除する
+   *
+   * @param {string} tabKey　タブキー
+   * @memberof TodoTaskService
+   */
+  async deleteTaskTargetTabKey(tabKey: string) {
+    try {
+      const taskList = await this.getTaskList();
+      const updateTaskList = taskList.filter((taskObj: TodoTask) => taskObj.key != tabKey);
+      await AsyncStorage.setItem('@taskkey', JSON.stringify(updateTaskList));
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  /**
    *  タスク一覧を取得
    *
    * @return {Promise<string>} タスク一覧（ストレージにタスク情報が存在しない場合は、空配列を返す）

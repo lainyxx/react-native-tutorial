@@ -168,6 +168,23 @@ export default function HomeScreen({ navigation }: any) {
     selectedEditTaskName = '';
   }
 
+  /**
+   * タスク削除処理
+   *
+   * @param {string} taskId 削除するタスクのID
+   */
+  async function deleteTask(taskId: string) {
+    try {
+      const todoTaskService = new TodoTaskService();
+      await todoTaskService.deleteTask(taskId);
+
+      const storageTaskList = await todoTaskService.getTaskList();
+      setTaskList(storageTaskList);
+    } catch (e) {
+      Alert.alert('エラー', 'Todoの削除に失敗しました', [{ text: 'OK' }]);
+    }
+  }
+
   const renderScene = ({ route }: any) => {
     switch (route.key) {
       default:
@@ -176,7 +193,9 @@ export default function HomeScreen({ navigation }: any) {
           <FlatList
             data={filterTaskList}
             renderItem={({ item }) => {
-              return <TodoListItem taskId={item.id} todoTitle={item.name} listItemTapped={showEditTaskAlert}></TodoListItem>;
+              return (
+                <TodoListItem taskId={item.id} todoTitle={item.name} listItemTapped={showEditTaskAlert} deleteBtnTapped={deleteTask}></TodoListItem>
+              );
             }}
             keyExtractor={(item) => item.id}
           />

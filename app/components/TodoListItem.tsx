@@ -24,16 +24,19 @@ const styles = StyleSheet.create({
  * @param {string} todoTitle - TODOタイトル
  * @param {string} todoTitle - TODOタイトル
  * @param {(taskId: stirng, todoTitle: string) => void} listItemTapped - リストタップ時の処理
+ * @param {(taskId: stirng) => void} deleteBtnTapped - 削除ボタン押下時の処理
  * @return {TodoListItem}
  */
 export default function TodoListItem({
   taskId,
   todoTitle,
   listItemTapped,
+  deleteBtnTapped,
 }: {
   taskId: string;
   todoTitle: string;
   listItemTapped: (taskId: string, tabTitle: string) => void;
+  deleteBtnTapped: (taskIs: string) => void;
 }) {
   /**
    *  ボタン押下イベント
@@ -43,6 +46,7 @@ export default function TodoListItem({
   const btnTapped = (btnId: number) => {
     if (btnId === 0) {
       // 削除処理を実行
+      deleteBtnTapped(taskId);
     }
   };
 
