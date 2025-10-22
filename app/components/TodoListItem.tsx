@@ -1,6 +1,5 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { ListItem } from 'react-native-elements';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import Checkmark from './Checkmark';
 import SwipeableRow from './SwipeableRow';
 
@@ -22,19 +21,24 @@ const styles = StyleSheet.create({
  * @export
  * @param {string} taskId -  TODOタスクID
  * @param {string} todoTitle - TODOタイトル
- * @param {string} todoTitle - TODOタイトル
- * @param {(taskId: stirng, todoTitle: string) => void} listItemTapped - リストタップ時の処理
- * @param {(taskId: stirng) => void} deleteBtnTapped - 削除ボタン押下時の処理
+ * @param {boolean} complete - TODOタスク完了フラグ
+ * @param {(taskId: string, todoTitle: string) => void} listItemTapped - リストタップ時の処理
+ * @param {(taskId: string) => void} deleteBtnTapped - 削除ボタン押下時の処理
+ * @param {(taskId: string, complete: boolean) => void} checkmarkTapped - チェックマーク押下時の処理
  * @return {TodoListItem}
  */
 export default function TodoListItem({
+  complete,
   taskId,
   todoTitle,
+  checkmarkTapped,
   listItemTapped,
   deleteBtnTapped,
 }: {
+  complete: boolean;
   taskId: string;
   todoTitle: string;
+  checkmarkTapped: (taskId: string, complete: boolean) => void;
   listItemTapped: (taskId: string, tabTitle: string) => void;
   deleteBtnTapped: (taskIs: string) => void;
 }) {
@@ -55,7 +59,7 @@ export default function TodoListItem({
       <TouchableOpacity onPress={() => listItemTapped(taskId, todoTitle)} activeOpacity={1}>
         <ListItem topDivider style={{ width: '100%' }}>
           <ListItem.Content style={styles.ListItem}>
-            <Checkmark complete={true} onPress={() => {}}></Checkmark>
+            <Checkmark complete={complete} onPress={(complete) => checkmarkTapped(taskId, complete)}></Checkmark>
             <ListItem.Title style={styles.ListItemTitle}>{`${todoTitle}`}</ListItem.Title>
           </ListItem.Content>
         </ListItem>

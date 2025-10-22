@@ -185,6 +185,25 @@ export default function HomeScreen({ navigation }: any) {
     }
   }
 
+  /**
+   * タスクチェック処理
+   *
+   * @param {string} taskId　タスクID
+   * @param {boolean} complete　タスク完了フラグ
+   */
+  async function checkTask(taskId: string, complete: boolean) {
+    try {
+      // タスクチェック処理
+      const todoTaskService = new TodoTaskService();
+      await todoTaskService.checkTask(taskId, complete);
+
+      const storageTaskList = await todoTaskService.getTaskList();
+      setTaskList(storageTaskList);
+    } catch (e) {
+      Alert.alert('エラー', 'Todoのチェックに失敗しました', [{ text: 'OK' }]);
+    }
+  }
+
   const renderScene = ({ route }: any) => {
     switch (route.key) {
       default:
@@ -194,7 +213,13 @@ export default function HomeScreen({ navigation }: any) {
             data={filterTaskList}
             renderItem={({ item }) => {
               return (
-                <TodoListItem taskId={item.id} todoTitle={item.name} listItemTapped={showEditTaskAlert} deleteBtnTapped={deleteTask}></TodoListItem>
+                <TodoListItem
+                  complete={item.complete}
+                  taskId={item.id}
+                  todoTitle={item.name}
+                  checkmarkTapped={(taskId, complete) => checkTask(taskId, !complete)}
+                  listItemTapped={showEditTaskAlert}
+                  deleteBtnTapped={deleteTask}></TodoListItem>
               );
             }}
             keyExtractor={(item) => item.id}
