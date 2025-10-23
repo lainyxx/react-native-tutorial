@@ -26,12 +26,13 @@ export default class TodoTabService {
   /**
    * Todoタブを追加する
    *
-   * @param {string} tabName
+   * @param {string} tabName　タブ名
+   * @param {string} tabKey タブキー（任意）
    * @memberof TodoTabService
    */
-  async addTab(tabName: string) {
+  async addTab(tabName: string, tabKey: string | null = null) {
     const addTabObj = {
-      key: this.createTabKey(),
+      key: tabKey ? tabKey : this.createTabKey(),
       name: tabName,
       date: new Date(),
     };

@@ -8,6 +8,8 @@ import FloatingButton from '../components/FloatingButton';
 import TextInputDialog from '../components/TextInputDialog';
 import TodoListItem from '../components/TodoListItem';
 import { TabContext, TabContextType } from '../contexts/TabContext';
+import InitTodoTab from '../jsons/InitTodoTab.json';
+import InitTodoTask from '../jsons/InitTodoTask.json';
 import TodoTabService, { TodoTab } from '../services/TodoTabService';
 import TodoTaskService, { TodoTask } from '../services/TodoTaskService';
 
@@ -66,13 +68,25 @@ export default function HomeScreen({ navigation }: any) {
   React.useEffect(() => {
     (async function () {
       try {
-        // タブ取得
         const todoTabService = new TodoTabService();
+        const todoTaskService = new TodoTaskService();
+
+        // 初期設定Todo登録処理
+        const initTabList = await todoTabService.getTabList();
+        if (!initTabList.length) {
+          for (const todoTabKey in InitTodoTab) {
+            await todoTabService.addTab(InitTodoTab[todoTabKey].name, InitTodoTab[todoTabKey].key);
+          }
+          for (const todoTaskKey in InitTodoTask) {
+            await todoTaskService.addTask(InitTodoTask[todoTaskKey].key, InitTodoTask[todoTaskKey].name);
+          }
+        }
+
+        // タブ取得
         const storageTabList = await todoTabService.getTabList();
         setTabList(storageTabList);
 
         // タスク取得
-        const todoTaskService = new TodoTaskService();
         const storageTaskList = await todoTaskService.getTaskList();
         setTaskList(storageTaskList);
 
