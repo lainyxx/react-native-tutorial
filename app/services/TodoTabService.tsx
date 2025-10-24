@@ -8,6 +8,7 @@ export type TodoTab = {
 };
 
 export default class TodoTabService {
+  TAB_KEY = '@tabKey';
   /**
    * Todoタブのキーを作成する
    *
@@ -40,7 +41,7 @@ export default class TodoTabService {
     try {
       let tabList = await this.getTabList();
       tabList.push(addTabObj);
-      await AsyncStorage.setItem('@tabkey', JSON.stringify(tabList));
+      await AsyncStorage.setItem(this.TAB_KEY, JSON.stringify(tabList));
     } catch (e) {
       throw e;
     }
@@ -60,7 +61,7 @@ export default class TodoTabService {
       editTabObj.name = editTabName;
       const updateTabList = tabList.map((tabObj: TodoTab) => (tabObj.key == editTabKey ? editTabObj : tabObj));
 
-      await AsyncStorage.setItem('@tabkey', JSON.stringify(updateTabList));
+      await AsyncStorage.setItem(this.TAB_KEY, JSON.stringify(updateTabList));
     } catch (e) {
       throw e;
     }
@@ -78,7 +79,7 @@ export default class TodoTabService {
       const tabList = await this.getTabList();
       const updateTabList = tabList.filter((tabObj: TodoTab) => tabObj.key != tabKey);
 
-      await AsyncStorage.setItem('@tabkey', JSON.stringify(updateTabList));
+      await AsyncStorage.setItem(this.TAB_KEY, JSON.stringify(updateTabList));
 
       // タブに紐づくタスクを削除
       const todoTaskService = new TodoTaskService();
@@ -96,7 +97,7 @@ export default class TodoTabService {
    */
   async getTabList() {
     try {
-      const jsonValue = await AsyncStorage.getItem('@tabkey');
+      const jsonValue = await AsyncStorage.getItem(this.TAB_KEY);
       const jsonParse = jsonValue ? JSON.parse(jsonValue) : [];
 
       return jsonParse;

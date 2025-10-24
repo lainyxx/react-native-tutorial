@@ -55,7 +55,7 @@ export default function TabScreen({ navigation }: any) {
    * @param {string} editTabKey
    * @param {string} editTabName
    */
-  function showEditTodoAlert(editTabKey: string, editTabName: string) {
+  function showEditTabAlert(editTabKey: string, editTabName: string) {
     selectedEditTabKey = editTabKey;
     selectedEditTabName = editTabName;
 
@@ -128,7 +128,7 @@ export default function TabScreen({ navigation }: any) {
         contentContainerStyle={{ paddingTop: 30 }}
         data={tabList}
         renderItem={({ item }) => {
-          return <TabListItem tabKey={item.key} tabTitle={item.name} listItemTapped={showEditTodoAlert} deleteBtnTapped={deleteTab}></TabListItem>;
+          return <TabListItem tabKey={item.key} tabTitle={item.name} listItemTapped={showEditTabAlert} deleteBtnTapped={deleteTab}></TabListItem>;
         }}
         keyExtractor={(item) => item.key}
       />
