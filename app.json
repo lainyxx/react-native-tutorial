@@ -1,26 +1,24 @@
 {
   "expo": {
-    "name": "react-native-tutorial",
+    "name": "Todoリスト",
     "slug": "react-native-tutorial",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/icon.png",
     "scheme": "reactnativetutorial",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "buildNumber": "1.0.0",
+      "bundleIdentifier": "com.lainy.react.native.tutorial",
+      "supportsTablet": false
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
+      "versionCode": 1,
+      "package": "com.lainy.react.native.tutorial",
+      "icon": "./assets/android_icon.png",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.reactnativetutorial"
+      "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static",
@@ -31,7 +29,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/splash.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
